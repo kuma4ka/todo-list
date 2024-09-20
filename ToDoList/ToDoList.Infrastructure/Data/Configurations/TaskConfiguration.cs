@@ -12,7 +12,6 @@ public class TaskConfiguration: IEntityTypeConfiguration<Domain.Entities.Task>
         
         builder.HasOne(t => t.Creator)
             .WithMany(u => u.Tasks)
-            .HasForeignKey(t => t.CreatorId)
             .IsRequired();
     }
 }

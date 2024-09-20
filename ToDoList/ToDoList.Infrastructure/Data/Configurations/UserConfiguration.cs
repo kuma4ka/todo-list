@@ -8,13 +8,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasMany(u => u.Tasks)
-            .WithOne(t => t.Creator)
-            .HasForeignKey(t => t.CreatorId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired();
-
         builder.HasIndex(u => u.Email)
             .IsUnique();
+        
+        builder.HasMany(u => u.Tasks)
+            .WithOne(t => t.Creator)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
