@@ -2,6 +2,6 @@ namespace ToDoList.Domain.Enums;
 
 public enum TaskStatusEnum
 {
-    InProgress,
-    Completed
+    InProgress = 0,
+    Completed = 1
 }

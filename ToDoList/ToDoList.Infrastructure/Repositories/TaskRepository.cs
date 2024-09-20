@@ -10,6 +10,11 @@ public class TaskRepository(ApplicationDbContext context) : ITaskRepository
         return await context.Tasks.FindAsync(id);
     }
 
+    public async Task<Domain.Entities.Task?> GetByIdAsync(string id)
+    {
+        return await context.Tasks.FindAsync(id);
+    }
+
     public async Task AddAsync(Domain.Entities.Task newTask)
     {
         ArgumentNullException.ThrowIfNull(newTask, nameof(newTask));
