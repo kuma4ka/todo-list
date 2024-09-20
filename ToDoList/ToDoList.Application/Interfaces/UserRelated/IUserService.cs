@@ -1,7 +1,7 @@
 using ToDoList.Application.DTOs.Result;
 using ToDoList.Application.DTOs.UserRelated;
 
-namespace ToDoList.Application.Interfaces;
+namespace ToDoList.Application.Interfaces.UserRelated;
 
 public interface IUserService
 {

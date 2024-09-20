@@ -11,6 +11,11 @@ public class UserRepository(ApplicationDbContext context) : IRepositoryGeneric<U
         return await context.Users.FindAsync(id);
     }
 
+    public async Task<User?> GetByIdAsync(string id)
+    {
+        return await context.Users.FindAsync(id);
+    }
+
     public async System.Threading.Tasks.Task AddAsync(User newUser)
     {
         ArgumentNullException.ThrowIfNull(newUser, nameof(newUser));
