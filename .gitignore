@@ -432,3 +432,6 @@ FodyWeavers.xsd
 
 # Including .idea directory for Rider
 .idea/
+
+# Ignore local configuration files
+appsettings.Development.json
