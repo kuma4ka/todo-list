@@ -11,6 +11,11 @@ public class UserManagerWrapper<TUser>(UserManager<TUser> userManager) : IUserMa
         return userManager.CreateAsync(user, password);
     }
 
+    public Task<TUser?> FindByIdAsync(string id)
+    {
+        return userManager.FindByIdAsync(id);
+    }
+    
     public Task<TUser?> FindByEmailAsync(string email)
     {
         return userManager.FindByEmailAsync(email);

@@ -21,8 +21,9 @@ public class EntityExistenceStep<T>(IRepositoryGeneric<T> repository) : IEntityE
     public async Task<Result<T>> GetIfExistsAsync(Guid id)
     {
         var entity = await repository.GetByIdAsync(id);
-        
-        return entity is null ? 
-            Result<T>.Failure([$"{typeof(T).Name} not found"]) : Result<T>.Success(entity);
+
+        return entity is null
+            ? Result<T>.Failure([$"{typeof(T).Name} not found"])
+            : Result<T>.Success(entity);
     }
 }

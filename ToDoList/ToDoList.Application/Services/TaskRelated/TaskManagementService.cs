@@ -1,3 +1,4 @@
+using FluentValidation;
 using Serilog;
 using ToDoList.Application.DTOs.Result;
 using ToDoList.Application.DTOs.TaskRelated;
@@ -10,19 +11,19 @@ using ToDoList.Infrastructure.Interfaces;
 namespace ToDoList.Application.Services.TaskRelated;
 
 public class TaskManagementService(
-    IRepositoryGeneric<User> userRepository,
     ITaskRepository taskRepository,
     IEntityExistenceStep<Domain.Entities.Task> taskExistenceStep,
+    IValidator<User?> userValidator,
     ILogger logger) : ITaskManagementService
 {
-    public async Task<Result> CreateTaskAsync(string creatorId, CreateTaskDto createTaskDto)
+    public async Task<Result> CreateTaskAsync(User? creator, CreateTaskDto createTaskDto)
     {
-        var creator = await userRepository.GetByIdAsync(creatorId);
+        var validationResult = await userValidator.ValidateAsync(creator);
 
-        if (creator is null)
+        if (!validationResult.IsValid)
         {
-            logger.Error("Failed to create task: Creator with ID {CreatorId} not found", creatorId);
-            return Result.Failure(["Creator not found"]);
+            return Result.Failure(validationResult
+                .Errors.Select(e => e.ErrorMessage).ToList());
         }
 
         var task = new Domain.Entities.Task
@@ -32,6 +33,8 @@ public class TaskManagementService(
             Description = createTaskDto.Description,
             TaskStatus = TaskStatusEnum.InProgress
         };
+
+        creator.Tasks.Add(task);
 
         await taskRepository.AddAsync(task);
         return Result.Success();
