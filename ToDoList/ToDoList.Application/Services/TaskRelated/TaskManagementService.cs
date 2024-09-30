@@ -22,8 +22,9 @@ public class TaskManagementService(
 
         if (!validationResult.IsValid)
         {
-            return Result.Failure(validationResult
-                .Errors.Select(e => e.ErrorMessage).ToList());
+            var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            logger.Warning("User validation failed for user: {UserId}. Errors: {Errors}", creator?.Id, errors);
+            return Result.Failure(errors);
         }
 
         var task = new Domain.Entities.Task
@@ -34,26 +35,51 @@ public class TaskManagementService(
             TaskStatus = TaskStatusEnum.InProgress
         };
 
-        creator.Tasks.Add(task);
+        try
+        {
+            creator.Tasks.Add(task);
+            await taskRepository.AddAsync(task);
 
-        await taskRepository.AddAsync(task);
-        return Result.Success();
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            logger.Error(ex, "An error occurred while creating the task for user: {UserId}", creator?.Id);
+            return Result.Failure(["An error occurred while creating the task."]);
+        }
     }
 
     public async Task<Result> UpdateTaskAsync(UpdateTaskDto updateTaskDto)
     {
         return await taskExistenceStep.ExecuteIfExistsAsync(updateTaskDto.Id, async task =>
         {
-            task.TaskTitle = updateTaskDto.Title;
-            task.Description = updateTaskDto.Description;
-
-            await taskRepository.UpdateAsync(task);
+            try
+            {
+                task.TaskTitle = updateTaskDto.Title;
+                task.Description = updateTaskDto.Description;
+                await taskRepository.UpdateAsync(task);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "An error occurred while updating the task. TaskId: {TaskId}", task.TaskId);
+                throw;
+            }
         });
     }
 
     public async Task<Result> DeleteTaskAsync(Guid taskId)
     {
-        return await taskExistenceStep.ExecuteIfExistsAsync(taskId,
-            async task => { await taskRepository.DeleteAsync(task.TaskId); });
+        return await taskExistenceStep.ExecuteIfExistsAsync(taskId, async task =>
+        {
+            try
+            {
+                await taskRepository.DeleteAsync(task.TaskId);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "An error occurred while deleting the task. TaskId: {TaskId}", task.TaskId);
+                throw;
+            }
+        });
     }
 }
