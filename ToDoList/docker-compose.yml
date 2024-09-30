@@ -1,0 +1,39 @@
+﻿version: "3.8"
+
+services:
+  todolist.api:
+    build:
+      context: .
+      dockerfile: ToDoList.Api/Dockerfile
+    image: todolist.api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    networks:
+      - todolist_network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+
+  database:
+    image: "postgres:15"
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - todolist_network
+
+networks:
+  todolist_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
