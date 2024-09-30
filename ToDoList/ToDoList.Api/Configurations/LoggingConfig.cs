@@ -15,7 +15,7 @@ public static class LoggingConfig
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog();
         });
-
+        
         services.AddSingleton(Log.Logger);
     }
 }
